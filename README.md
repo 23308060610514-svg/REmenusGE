@@ -19,8 +19,7 @@ Alumnos:
 Del Rio De La Cruz Erik Ruben
 23308060610614
 
-![](<img width="900" height="1600" alt="erik" src="https://github.com/user-attachments/assets/1c09dcb6-71e1-4ae6-940f-2f7ef401a521" />
-)
+![](https://github.com/23308060610514-svg/REmenusGE/blob/0c45426f389ce6acf083b2879fe6fdefb00b2cd7/erik.jpeg)
 
 Ruelas Lopez Guillermo Adiel
 23308060610328
