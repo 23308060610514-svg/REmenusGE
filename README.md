@@ -23,5 +23,4 @@ Del Rio De La Cruz Erik Ruben
 
 Ruelas Lopez Guillermo Adiel
 23308060610328
-![](<img width="900" height="1600" alt="yo" src="https://github.com/user-attachments/assets/f98a9d71-607e-4b79-a747-8d598782e840" />
-)
+![](https://github.com/23308060610514-svg/REmenusGE/blob/7b4035e93b229936c24a186d5d48abcb1aef755d/yo.jpeg)
