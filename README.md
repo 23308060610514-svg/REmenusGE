@@ -19,8 +19,8 @@ Alumnos:
 Del Rio De La Cruz Erik Ruben
 23308060610614
 
-![](https://github.com/23308060610514-svg/REmenusGE/blob/0c45426f389ce6acf083b2879fe6fdefb00b2cd7/erik.jpeg =400x200)
+![](https://github.com/23308060610514-svg/REmenusGE/blob/0c45426f389ce6acf083b2879fe6fdefb00b2cd7/erik.jpeg)
 
 Ruelas Lopez Guillermo Adiel
 23308060610328
-![](https://github.com/23308060610514-svg/REmenusGE/blob/7b4035e93b229936c24a186d5d48abcb1aef755d/yo.jpeg =400x200)
+![](https://github.com/23308060610514-svg/REmenusGE/blob/7b4035e93b229936c24a186d5d48abcb1aef755d/yo.jpeg)
