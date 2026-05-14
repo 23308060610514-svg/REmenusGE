@@ -1,4 +1,4 @@
-# Propósito:
+# 1.Propósito:
 El propósito principal de nuestro proyecto es desarrollar un menú digital destinado a tres tipos derestaurantes: uno de comida mexicana, uno de comida china y otro de mariscos.
 El objetivo de esta aplicación surge debido a que, usualmente, en los establecimientos físicos suelen faltar cartas de menú. Nuestra solución no solo brinda el menú digital, sino que optimiza el proceso de orden al permitir reservar una mesa por internet. Esto facilita la experiencia del usuario, permitiéndole visualizar en tiempo real cuáles mesas están ocupadas y cuáles disponibles.
 Además de tener el menú al alcance de la mano y conocer los detalles de cada platillo, la aplicación ofrecerá información sobre el restaurante, destacando sus especialidades y mejores comidas para guiar al comensal en su elección.
@@ -14,6 +14,9 @@ En este sistema, la información se articula a través de 3 cosas fundamentales 
 En primera, se encuentran los actores externos, que se integran por el comensal, quien genera las solicitudes de reserva y consulta, y el administrador, el responsable de mantener actualizada la oferta gastronómica.
 En segundo, viene la plataforma digital, la cual contiene procesamientos encargados de transformar los datos en una interfaz visual interactiva.
 Y por último, tenemos el sistema de una base de datos centralizada, la cual actúa como la entidad de almacenamiento donde se registra en tiempo real la disponibilidad de las mesas y los detalles de los menús para los tres restaurantes.
+# 2.Diagrama De Flujo 
+![](https://github.com/23308060610514-svg/REmenusGE/blob/c40a7e9f5c08e5e5a6e8cb44aaf5ff4456bb21ee/Captura%20de%20pantalla%202026-05-13%20224926.png)
+
 
 Alumnos:
 Del Rio De La Cruz Erik Ruben
