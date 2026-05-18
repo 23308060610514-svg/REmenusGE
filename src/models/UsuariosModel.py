@@ -3,7 +3,7 @@ from .databaseModel import Database
 
 class UsuarioModel:
     def __init__(self):
-        self.db = database()
+        self.db = Database()
     
     def email_existe(self, email):
         conn = self.db.get_connection()

@@ -27,3 +27,34 @@ Del Rio De La Cruz Erik Ruben
 Ruelas Lopez Guillermo Adiel
 23308060610328
 ![](https://github.com/23308060610514-svg/REmenusGE/blob/7b4035e93b229936c24a186d5d48abcb1aef755d/yo.jpeg)
+
+
+
+
+
+
+
+informacion que necesito para que se ejecute bien:powershell
+# 1. Sal del entorno virtual actual
+deactivate
+
+# 2. Elimina el entorno virtual viejo
+rm -r .venv
+
+# 3. Crea un nuevo entorno virtual
+python -m venv .venv
+
+# 4. Activa el nuevo entorno
+.venv\Scripts\activate
+
+# 5. Verifica que ahora apunta al lugar correcto
+where python
+# Debería mostrar: C:\Users\SALA2-PC2\Desktop\REmenusGE\.venv\Scripts\python.exe
+
+# 6. Instala los paquetes (ya no debería decir "user installation")
+pip install email-validator
+pip install 'pydantic[email]'
+pip install mysql-connector-python
+
+# 7. Ejecuta tu aplicación
+python src/main.py
