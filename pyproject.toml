@@ -11,6 +11,7 @@ dependencies = [
     "flet>=0.84.0",
     "mysql-connector>=2.2.9",
     "pydantic>=2.13.4",
+    "typing>=3.10.0.0",
 ]
 
 [project.scripts]
