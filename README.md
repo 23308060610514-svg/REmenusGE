@@ -58,3 +58,6 @@ pip install mysql-connector-python
 
 # 7. Ejecuta tu aplicación
 python src/main.py
+
+# 8. por si acaso:
+uv add pyjwt
