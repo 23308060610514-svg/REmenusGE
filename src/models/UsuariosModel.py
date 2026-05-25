@@ -28,7 +28,7 @@ class UsuarioModel:
             conn.commit()
             return True
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error en registrar: {e}")
             return False
         finally:
             conn.close()
@@ -40,14 +40,15 @@ class UsuarioModel:
         user = cursor.fetchone()
         conn.close()
         
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
-            return user
+        if user:
+            try:
+                if bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
+                    return user
+            except:
+                if password == user['Password']:
+                    return user
         return None
     
-    def actualizar_ultimo_acceso(self, id_usuario):
-        # Tu tabla no tiene campo ultimo_acceso, lo omitimos o lo agregamos
-        pass
-        
     def obtener_por_id(self, id_usuario):
         conn = self.db.get_connection()
         cursor = conn.cursor(dictionary=True)
