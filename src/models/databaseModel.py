@@ -1,14 +1,20 @@
 import mysql.connector
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from mysql.connector import Error
 
 class Database:
+    def __init__(self):
+        self.config = {
+            'host': 'localhost',
+            'user': 'root',
+            'password': '',
+            'database': 'tareas',
+            'port': 3306
+        }
+    
     def get_connection(self):
-        return mysql.connector.connect(
-            host="127.0.0.1", 
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME")
-        )
+        try:
+            connection = mysql.connector.connect(**self.config)
+            return connection
+        except Error as e:
+            print(f"Error al conectar a MySQL: {e}")
+            return None

@@ -9,23 +9,29 @@ from view.MenuView import MenuView
 from view.DetalleMenuView import DetalleMenuView
 
 def start(page: ft.Page):
+    # Configuración de la página (sin window_center)
     page.title = "REmenus - Sistema de Menús"
-    page.theme_mode = ft.ThemeMode.LIGHT 
+    page.theme_mode = ft.ThemeMode.LIGHT
     page.bgcolor = ft.Colors.GREY_50
     page.window_width = 1200
     page.window_height = 800
     page.window_resizable = True
     
+    # Controladores
     auth_ctrl = AuthController()
     menu_ctrl = MenuController()
 
     def route_change(e):
+        print(f"📍 Navegando a: {page.route}")
+        
+        # Limpiar vistas
         page.views.clear()
         
+        # ========== RUTAS ==========
         if page.route == "/":
             page.views.append(LoginView(page, auth_ctrl))
             
-        elif page.route == "/register": 
+        elif page.route == "/register":
             page.views.append(RegisterView(page, auth_ctrl))
             
         elif page.route == "/recover":
@@ -38,7 +44,7 @@ def start(page: ft.Page):
                 page.go("/")
                 
         elif page.route.startswith("/menus/"):
-            tipo = page.route.split("/")[-1]  # mexicana, china o mariscos
+            tipo = page.route.split("/")[-1]
             if page.user_data:
                 page.views.append(DetalleMenuView(page, auth_ctrl, menu_ctrl, tipo))
             else:
@@ -51,6 +57,7 @@ def start(page: ft.Page):
                 page.go("/")
                 
         else:
+            # Vista 404
             page.views.append(
                 ft.View(
                     "/404",
@@ -74,9 +81,9 @@ def start(page: ft.Page):
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 )
             )
-
-        page.update()
         
+        page.update()
+    
     def view_pop(e):
         if len(page.views) > 1:
             page.views.pop()
@@ -84,10 +91,12 @@ def start(page: ft.Page):
             page.go(top_view.route)
         else:
             page.window_close()
-            
+    
+    # Asignar eventos
     page.on_route_change = route_change
     page.on_view_pop = view_pop
-
+    
+    # Iniciar
     page.go("/")
 
 def main():

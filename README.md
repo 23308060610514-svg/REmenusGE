@@ -61,3 +61,5 @@ python src/main.py
 
 # 8. por si acaso:
 uv add pyjwt
+
+uv add sync
