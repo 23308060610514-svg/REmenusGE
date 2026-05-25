@@ -8,7 +8,7 @@ class UsuarioModel:
     def email_existe(self, email):
         conn = self.db.get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id_usuario FROM usuarios WHERE email = %s", (email,))
+        cursor.execute("SELECT ID_usuario FROM usuarios WHERE Email = %s", (email,))
         existe = cursor.fetchone() is not None
         conn.close()
         return existe
@@ -21,10 +21,9 @@ class UsuarioModel:
         cursor = conn.cursor()
         try:
             cursor.execute(
-                """INSERT INTO usuarios (nombre, apellido, telefono, email, password) 
-                VALUES (%s, %s, %s, %s, %s)""",
-                (usuario_data.nombre, usuario_data.apellido, usuario_data.telefono, 
-                usuario_data.email, hashed_pw.decode('utf-8'))
+                """INSERT INTO usuarios (User, Email, Password, Fecha_Registro) 
+                VALUES (%s, %s, %s, CURDATE())""",
+                (usuario_data.nombre, usuario_data.email, hashed_pw.decode('utf-8'))
             )
             conn.commit()
             return True
@@ -37,28 +36,22 @@ class UsuarioModel:
     def validar_login(self, email, password):
         conn = self.db.get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
+        cursor.execute("SELECT * FROM usuarios WHERE Email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
         
-        if user and bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
+        if user and bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
             return user
         return None
     
     def actualizar_ultimo_acceso(self, id_usuario):
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE usuarios SET ultimo_acceso = NOW() WHERE id_usuario = %s",
-            (id_usuario,)
-        )
-        conn.commit()
-        conn.close()
+        # Tu tabla no tiene campo ultimo_acceso, lo omitimos o lo agregamos
+        pass
         
     def obtener_por_id(self, id_usuario):
         conn = self.db.get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+        cursor.execute("SELECT ID_usuario, User as nombre, Email as email FROM usuarios WHERE ID_usuario = %s", (id_usuario,))
         user = cursor.fetchone()
         conn.close()
         return user
