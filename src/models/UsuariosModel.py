@@ -1,5 +1,5 @@
 import bcrypt
-from .databaseModel import Database
+from .databaseModel import Database  # ← CORRECTO (mismo directorio)
 
 class UsuarioModel:
     def __init__(self):
@@ -28,7 +28,7 @@ class UsuarioModel:
             conn.commit()
             return True
         except Exception as e:
-            print(f"Error en registrar: {e}")
+            print(f"Error: {e}")
             return False
         finally:
             conn.close()
