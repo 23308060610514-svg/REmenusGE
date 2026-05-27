@@ -1,5 +1,5 @@
 import bcrypt
-from .databaseModel import Database  # ← CORRECTO (mismo directorio)
+from .databaseModel import Database
 
 class UsuarioModel:
     def __init__(self):
@@ -14,8 +14,16 @@ class UsuarioModel:
         return existe
         
     def registrar(self, usuario_data):
-        salt = bcrypt.gensalt()
-        hashed_pw = bcrypt.hashpw(usuario_data.password.encode('utf-8'), salt)
+        print(f"📝 Registrando: {usuario_data.email}")
+        print(f"   Contraseña: '{usuario_data.password}'")
+        
+        # Generar hash
+        password_bytes = usuario_data.password.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=12)
+        hashed = bcrypt.hashpw(password_bytes, salt)
+        hashed_str = hashed.decode('utf-8')
+        
+        print(f"   Hash generado: {hashed_str[:50]}...")
         
         conn = self.db.get_connection()
         cursor = conn.cursor()
@@ -23,31 +31,45 @@ class UsuarioModel:
             cursor.execute(
                 """INSERT INTO usuarios (User, Email, Password, Fecha_Registro) 
                 VALUES (%s, %s, %s, CURDATE())""",
-                (usuario_data.nombre, usuario_data.email, hashed_pw.decode('utf-8'))
+                (usuario_data.nombre, usuario_data.email, hashed_str)
             )
             conn.commit()
+            print("   ✅ Usuario registrado")
             return True
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"   ❌ Error: {e}")
             return False
         finally:
             conn.close()
         
     def validar_login(self, email, password):
+        print(f"\n🔐 Login: {email}")
+        print(f"   Contraseña: '{password}'")
+        
         conn = self.db.get_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM usuarios WHERE Email = %s", (email,))
         user = cursor.fetchone()
         conn.close()
         
-        if user:
-            try:
-                if bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
-                    return user
-            except:
-                if password == user['Password']:
-                    return user
-        return None
+        if not user:
+            print("   ❌ Usuario no existe")
+            return None
+        
+        print(f"   Usuario: {user['User']}")
+        print(f"   Hash BD: {user['Password'][:50]}...")
+        
+        # Verificar
+        try:
+            if bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
+                print("   ✅ LOGIN EXITOSO")
+                return user
+            else:
+                print("   ❌ Contraseña incorrecta")
+                return None
+        except Exception as e:
+            print(f"   ❌ Error: {e}")
+            return None
     
     def obtener_por_id(self, id_usuario):
         conn = self.db.get_connection()

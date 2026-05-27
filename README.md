@@ -51,7 +51,7 @@ python -m venv .venv
 where python
 # Debería mostrar: C:\Users\SALA2-PC2\Desktop\REmenusGE\.venv\Scripts\python.exe
 
-# 6. Instala los paquetes (ya no debería decir "user installation")
+# 6. Instala los paquetes (ya no debería decir)
 pip install email-validator
 pip install 'pydantic[email]'
 pip install mysql-connector-python
@@ -62,4 +62,4 @@ python src/main.py
 # 8. por si acaso:
 uv add pyjwt
 
-uv add sync
+uv sync

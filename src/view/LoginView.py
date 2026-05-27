@@ -35,8 +35,6 @@ def LoginView(page: ft.Page, auth_controller):
         page.update()
 
     def login_click(e):
-        print(f"🔐 Intentando login con: {correo.value}")  # Debug
-        
         if not correo.value or not contraseña.value:
             mensaje.value = "⚠️ Por favor, llene todos los campos"
             mensaje.color = "red"
@@ -44,11 +42,8 @@ def LoginView(page: ft.Page, auth_controller):
             return
         
         user, msg = auth_controller.login(correo.value, contraseña.value)
-        print(f"📦 Resultado login - User: {user}, Msg: {msg}")  # Debug
-        
         if user:
             page.user_data = user
-            print(f"✅ user_data guardado: {page.user_data}")  # Debug
             mostrar_snackbar("✓ ¡Bienvenido a REMenus!", ft.Colors.GREEN_600)
             page.go("/dashboard")
         else:
@@ -80,6 +75,7 @@ def LoginView(page: ft.Page, auth_controller):
     
     contraseña.on_submit = login_click
 
+    # ✅ CORRECTO
     return ft.View(
         route="/",
         vertical_alignment=ft.MainAxisAlignment.CENTER,

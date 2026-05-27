@@ -12,8 +12,6 @@ def RegisterView(page: ft.Page, auth_controller):
         width=400, 
         border_radius=12,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     apellido = ft.TextField(
@@ -22,8 +20,6 @@ def RegisterView(page: ft.Page, auth_controller):
         width=400, 
         border_radius=12,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     telefono = ft.TextField(
@@ -33,8 +29,6 @@ def RegisterView(page: ft.Page, auth_controller):
         border_radius=12,
         keyboard_type=ft.KeyboardType.PHONE,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     email = ft.TextField(
@@ -44,8 +38,6 @@ def RegisterView(page: ft.Page, auth_controller):
         border_radius=12,
         keyboard_type=ft.KeyboardType.EMAIL,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     password = ft.TextField(
@@ -56,8 +48,6 @@ def RegisterView(page: ft.Page, auth_controller):
         width=400, 
         border_radius=12,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     confirm_password = ft.TextField(
@@ -68,8 +58,6 @@ def RegisterView(page: ft.Page, auth_controller):
         width=400, 
         border_radius=12,
         bgcolor=ft.Colors.WHITE,
-        border_color=ft.Colors.BLUE_200,
-        focused_border_color=ft.Colors.BLUE_600,
     )
     
     mensaje = ft.Text("", color="red", size=12)
@@ -84,28 +72,18 @@ def RegisterView(page: ft.Page, auth_controller):
         page.update()
 
     def registrar_click(e):
-        # Validar campos obligatorios
         if not all([nombre.value, email.value, password.value]):
             mensaje.value = "⚠️ Nombre, Email y Contraseña son obligatorios"
             mensaje.color = "red"
             page.update()
             return
         
-        # Validar contraseñas
         if password.value != confirm_password.value:
             mensaje.value = "⚠️ Las contraseñas no coinciden"
             mensaje.color = "red"
             page.update()
             return
-        
-        # Validar longitud de contraseña
-        if len(password.value) < 4:
-            mensaje.value = "⚠️ La contraseña debe tener al menos 4 caracteres"
-            mensaje.color = "red"
-            page.update()
-            return
 
-        # Validar con Pydantic
         try:
             usuario_data = UsuarioSchema(
                 nombre=nombre.value,
@@ -120,17 +98,14 @@ def RegisterView(page: ft.Page, auth_controller):
             page.update()
             return
 
-        # Registrar usuario
         exito, msg = auth_controller.registrar(usuario_data)
         
         if exito:
             mostrar_snackbar("✓ ¡Registro exitoso! Ahora inicia sesión", ft.Colors.GREEN_600)
-            # Limpiar campos
             for field in [nombre, apellido, telefono, email, password, confirm_password]:
                 field.value = ""
             mensaje.value = ""
             page.update()
-            # Redirigir al login
             page.go("/")
         else:
             mensaje.value = f"✗ {msg}"
@@ -146,20 +121,17 @@ def RegisterView(page: ft.Page, auth_controller):
             bgcolor=ft.Colors.GREEN_600,
             color=ft.Colors.WHITE,
             shape=ft.RoundedRectangleBorder(radius=12),
-            elevation=3,
-            text_style=ft.TextStyle(size=14, weight=ft.FontWeight.BOLD, letter_spacing=1),
         ),
     )
     
     btn_login = ft.TextButton(
         "🔑 ¿Ya tienes cuenta? Inicia sesión",
         on_click=lambda _: page.go("/"),
-        style=ft.ButtonStyle(color=ft.Colors.BLUE_600),
     )
     
-    # Permitir registro con Enter en el último campo
     confirm_password.on_submit = registrar_click
     
+    # ✅ CORRECTO
     return ft.View(
         route="/register",
         vertical_alignment=ft.MainAxisAlignment.CENTER,
@@ -170,7 +142,6 @@ def RegisterView(page: ft.Page, auth_controller):
             bgcolor=ft.Colors.BLUE_700,
             color=ft.Colors.WHITE,
             center_title=True,
-            elevation=2,
             leading=ft.IconButton(
                 ft.Icons.ARROW_BACK_ROUNDED, 
                 on_click=lambda _: page.go("/"),
@@ -216,5 +187,5 @@ def RegisterView(page: ft.Page, auth_controller):
                 tight=True,
                 spacing=0,
             )
-        ]
+        ],
     )
