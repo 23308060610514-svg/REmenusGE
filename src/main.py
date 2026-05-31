@@ -17,8 +17,8 @@ def start(page: ft.Page):
 
     def route_change(e):
         print(f"📍 Ruta: {page.route}")
-        
-        # Crear la vista según la ruta
+    
+    # Crear la vista según la ruta
         if page.route == "/":
             view = LoginView(page, auth_ctrl)
         elif page.route == "/register": 
@@ -28,21 +28,25 @@ def start(page: ft.Page):
         elif page.route == "/perfil":
             view = UserView(page, auth_ctrl)
         else:
+        # ✅ CORREGIDO - Versión más simple
             view = ft.View(
                 "/404",
-                controls=[
-                    ft.AppBar(title=ft.Text("Error"), bgcolor=ft.Colors.RED_ACCENT),
-                    ft.Column([
+                ft.AppBar(title=ft.Text("Error"), bgcolor=ft.Colors.RED_ACCENT),
+                ft.Column(
+                    [
                         ft.Text("Error: Ruta no encontrada", size=30),
                         ft.Text(f"La ruta '{page.route}' no existe", size=16),
                         ft.ElevatedButton("Volver al inicio", on_click=lambda _: page.go("/"))
-                    ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
-                ],
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    expand=True
+                ),
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
-        
-        # Asignar la vista
+    
+    # Asignar la vista
         page.views.clear()
         page.views.append(view)
         page.update()
@@ -65,3 +69,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
