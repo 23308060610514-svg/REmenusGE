@@ -14,6 +14,20 @@ class UsuarioModel:
         return existe
         
     def registrar(self, usuario_data):
+    
+    # Generar hash
+        password_bytes = usuario_data.password.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=12)
+        hashed = bcrypt.hashpw(password_bytes, salt)
+        hashed_str = hashed.decode('utf-8')
+    
+    # Verificar longitud
+        if len(hashed_str) > 255:
+            print(f"⚠️ Hash muy largo: {len(hashed_str)} caracteres")
+        else:
+            print(f"✅ Hash generado: {len(hashed_str)} caracteres")
+    
+    # Resto del código...
         print(f"📝 Registrando: {usuario_data.email}")
         print(f"   Contraseña: '{usuario_data.password}'")
         
