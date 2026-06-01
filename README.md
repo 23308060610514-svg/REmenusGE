@@ -34,7 +34,7 @@ Ruelas Lopez Guillermo Adiel
 
 
 
-informacion que necesito para que se ejecute bien:powershell
+informacion que necesito para que se ejecute bien:
 # 1. Sal del entorno virtual actual
 deactivate
 

@@ -1,4 +1,4 @@
-from models.UsuariosModel import UsuarioModel  # ← CORREGIDO
+from models.UsuariosModel import UsuarioModel
 
 class AuthController:
     def __init__(self):

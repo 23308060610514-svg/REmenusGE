@@ -1,4 +1,4 @@
-from models.MenuModel import MenuModel  # ← CORREGIDO
+from models.MenuModel import MenuModel 
 
 class MenuController:
     def __init__(self):

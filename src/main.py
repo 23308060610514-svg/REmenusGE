@@ -28,7 +28,7 @@ def start(page: ft.Page):
         elif page.route == "/perfil":
             view = UserView(page, auth_ctrl)
         else:
-        # ✅ CORREGIDO - Versión más simple
+        
             view = ft.View(
                 "/404",
                 ft.AppBar(title=ft.Text("Error"), bgcolor=ft.Colors.RED_ACCENT),
@@ -46,7 +46,7 @@ def start(page: ft.Page):
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
     
-    # Asignar la vista
+    
         page.views.clear()
         page.views.append(view)
         page.update()
@@ -60,9 +60,9 @@ def start(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
     
-    # Forzar la primera carga
+    
     page.route = "/"
-    route_change(None)  # Llamada manual
+    route_change(None) 
 
 def main():
     ft.app(target=start)
