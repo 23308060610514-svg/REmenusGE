@@ -1,9 +1,19 @@
 import flet as ft
+from models.MenuModel import MenuModel
 
-def DashboardView(page: ft.Page, auth_controller, menu_controller):
+def DashboardView(page: ft.Page, auth_controller):
     
     page.bgcolor = ft.Colors.GREY_50
     page.title = "REmenus - Dashboard"
+    
+    # Inicializar carrito en user_data si no existe
+    if page.user_data is None:
+        page.user_data = {}
+    if 'carrito' not in page.user_data:
+        page.user_data['carrito'] = []
+    
+    # Crear el modelo directamente
+    menu_model = MenuModel()
     
     # Obtener nombre del usuario
     nombre_usuario = page.user_data.get('nombre', 'Usuario') if page.user_data else "Usuario"
@@ -25,13 +35,24 @@ def DashboardView(page: ft.Page, auth_controller, menu_controller):
     def ir_a_perfil(e):
         page.go("/perfil")
     
-    def agregar_al_carrito(nombre_platillo, precio):
-        mostrar_snackbar(f"✓ {nombre_platillo} agregado al carrito", ft.Colors.GREEN_600)
+    def ir_al_carrito(e):
+        page.go("/carrito")
+    
+    def agregar_al_carrito(platillo):
+        # Agregar al carrito en user_data
+        page.user_data['carrito'].append(platillo)
+        total_items = len(page.user_data['carrito'])
+        total_precio = sum(float(item['precio']) for item in page.user_data['carrito'])
+        mostrar_snackbar(f"✓ {platillo['nombre']} agregado al carrito (Total: {total_items} items - ${total_precio:.2f})", ft.Colors.GREEN_600)
+        
+        # Actualizar el contador del botón del carrito
+        btn_carrito.content = ft.Text(f"🛒 {total_items}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)
+        page.update()
     
     # Obtener platillos de cada categoría
-    platillos_mexicanos = menu_controller.obtener_platillos_mexicanos()
-    platillos_chinos = menu_controller.obtener_platillos_chinos()
-    platillos_mariscos = menu_controller.obtener_platillos_mariscos()
+    platillos_mexicanos = menu_model.obtener_platillos_mexicanos()
+    platillos_chinos = menu_model.obtener_platillos_chinos()
+    platillos_mariscos = menu_model.obtener_platillos_mariscos()
     
     # ========== FUNCIÓN PARA CREAR TARJETA DE PLATILLO ==========
     def crear_tarjeta_platillo(platillo, color):
@@ -56,7 +77,7 @@ def DashboardView(page: ft.Page, auth_controller, menu_controller):
                         icon=ft.Icons.ADD_SHOPPING_CART,
                         icon_color=color,
                         icon_size=30,
-                        on_click=lambda e, n=platillo['nombre'], p=platillo['precio']: agregar_al_carrito(n, p),
+                        on_click=lambda e, p=platillo: agregar_al_carrito(p),
                         tooltip="Agregar al carrito",
                     ),
                 ],
@@ -144,18 +165,31 @@ def DashboardView(page: ft.Page, auth_controller, menu_controller):
         margin=ft.margin.only(bottom=20),
     )
     
-    # Botones del AppBar
-    btn_perfil = ft.PopupMenuButton(
-        icon=ft.Icons.PERSON_ROUNDED,
-        icon_color=ft.Colors.WHITE,
-        items=[
-            ft.PopupMenuItem(text="Mi Perfil", on_click=ir_a_perfil, icon=ft.Icons.PERSON),
-            ft.PopupMenuItem(),
-            ft.PopupMenuItem(text="Cerrar Sesión", on_click=cerrar_sesion, icon=ft.Icons.LOGOUT),
-        ]
+    # Botón del carrito con contador
+    total_items = len(page.user_data['carrito'])
+    btn_carrito = ft.Container(
+        content=ft.Text(f"🛒 {total_items}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+        bgcolor=ft.Colors.GREEN_600,
+        border_radius=20,
+        padding=10,
+        on_click=ir_al_carrito,
     )
     
-    # ========== VISTA PRINCIPAL ==========
+    btn_perfil = ft.IconButton(
+        icon=ft.Icons.PERSON_ROUNDED,
+        icon_color=ft.Colors.WHITE,
+        on_click=ir_a_perfil,
+        tooltip="Mi Perfil",
+    )
+    
+    btn_cerrar = ft.IconButton(
+        icon=ft.Icons.LOGOUT_ROUNDED,
+        icon_color=ft.Colors.WHITE,
+        on_click=cerrar_sesion,
+        tooltip="Cerrar Sesión",
+    )
+    
+    # ========== VISTA PRINCIPAL CON SCROLL ==========
     return ft.View(
         route="/dashboard",
         bgcolor=ft.Colors.GREY_50,
@@ -163,11 +197,11 @@ def DashboardView(page: ft.Page, auth_controller, menu_controller):
             title=ft.Text("REmenus - Dashboard", size=24, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
             bgcolor=ft.Colors.BLUE_700,
             center_title=True,
-            actions=[btn_perfil],
+            actions=[btn_perfil, btn_carrito, btn_cerrar],
             elevation=4,
         ),
         controls=[
-            ft.Column(
+            ft.ListView(
                 [
                     # Tarjeta de bienvenida
                     ft.Container(
@@ -199,13 +233,13 @@ def DashboardView(page: ft.Page, auth_controller, menu_controller):
                     # Pie de página
                     ft.Container(
                         content=ft.Text("© 2024 REMenus - Todos los derechos reservados", 
-                                        size=12, color=ft.Colors.GREY_500),
-                        alignment=ft.alignment.center,
+                                       size=12, color=ft.Colors.GREY_500),
                         padding=20,
                     ),
                 ],
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                scroll=ft.ScrollMode.AUTO,
-            )
+                spacing=0,
+                height=page.window_height,
+                auto_scroll=False,
+            ),
         ],
     )

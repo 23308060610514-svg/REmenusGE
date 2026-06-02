@@ -4,6 +4,8 @@ from view.LoginView import LoginView
 from view.RegisterView import RegisterView  
 from view.UsuarioView import UserView
 from view.RecoverView import RecoverView
+from view.DashboardView import DashboardView
+from view.CarritoView import CarritoView
 
 def start(page: ft.Page):
     page.title = "Sistema REMenus"
@@ -27,6 +29,10 @@ def start(page: ft.Page):
             view = RecoverView(page, auth_ctrl)
         elif page.route == "/perfil":
             view = UserView(page, auth_ctrl)
+        elif page.route == "/dashboard":
+            view = DashboardView(page, auth_ctrl)
+        elif page.route == "/carrito":
+            view = CarritoView(page, auth_ctrl)
         else:
         
             view = ft.View(
