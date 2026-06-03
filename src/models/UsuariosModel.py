@@ -1,94 +1,229 @@
+from models.UsuariosModel import UsuarioModel
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import bcrypt
-from .databaseModel import Database
+import time
+import hashlib
 
-class UsuarioModel:
+class AuthController:
     def __init__(self):
-        self.db = Database()
-    
-    def email_existe(self, email):
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT ID_usuario FROM usuarios WHERE Email = %s", (email,))
-        existe = cursor.fetchone() is not None
-        conn.close()
-        return existe
-        
-    def registrar(self, usuario_data):
-    
-    # Generar hash
-        password_bytes = usuario_data.password.encode('utf-8')
-        salt = bcrypt.gensalt(rounds=12)
-        hashed = bcrypt.hashpw(password_bytes, salt)
-        hashed_str = hashed.decode('utf-8')
-    
-    # Verificar longitud
-        if len(hashed_str) > 255:
-            print(f"⚠️ Hash muy largo: {len(hashed_str)} caracteres")
-        else:
-            print(f"✅ Hash generado: {len(hashed_str)} caracteres")
-    
-    # Resto del código...
-        print(f"📝 Registrando: {usuario_data.email}")
-        print(f"   Contraseña: '{usuario_data.password}'")
-        
-        # Generar hash
-        password_bytes = usuario_data.password.encode('utf-8')
-        salt = bcrypt.gensalt(rounds=12)
-        hashed = bcrypt.hashpw(password_bytes, salt)
-        hashed_str = hashed.decode('utf-8')
-        
-        print(f"   Hash generado: {hashed_str[:50]}...")
-        
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
+        self.usuario_model = UsuarioModel()
+        self.tokens_activos = {}  # Almacén temporal de tokens
+
+    def login(self, email, password):
         try:
-            cursor.execute(
-                """INSERT INTO usuarios (User, Email, Password, Fecha_Registro) 
-                VALUES (%s, %s, %s, CURDATE())""",
-                (usuario_data.nombre, usuario_data.email, hashed_str)
-            )
-            conn.commit()
-            print("   ✅ Usuario registrado")
+            user_db = self.usuario_model.validar_login(email, password)
+
+            if not user_db:
+                return None, "Correo o contraseña incorrectos"
+
+            user = {
+                "id_usuario": user_db["ID_usuario"],
+                "nombre": user_db["User"],
+                "email": user_db["Email"],
+            }
+
+            return user, "Login exitoso"
+
+        except Exception as e:
+            return None, f"Error en login: {str(e)}"
+
+    def registrar(self, usuario_data):
+        try:
+            if self.usuario_model.email_existe(usuario_data.email):
+                return False, "El correo electrónico ya está registrado"
+
+            exito = self.usuario_model.registrar(usuario_data)
+
+            if exito:
+                return True, "Usuario registrado exitosamente"
+            else:
+                return False, "Error al registrar usuario"
+
+        except Exception as e:
+            return False, f"Error en registro: {str(e)}"
+
+    def enviar_correo_recuperacion(self, email, token, username):
+        """Envía correo real de recuperación"""
+        try:
+            # Configuración - CAMBIA ESTOS DATOS
+            EMAIL_USER = "ruelas.pato.2009@gmail.com"
+            EMAIL_PASSWORD = "fjio arzz vbmd yqcu"
+
+            mensaje = MIMEMultipart("alternative")
+            mensaje["Subject"] = "REmenus - Recuperación de Contraseña"
+            mensaje["From"] = f"REmenus <{EMAIL_USER}>"
+            mensaje["To"] = email
+
+            html = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                    <h2 style="color: #1565C0;">🔐 REMenus - Recupera tu Contraseña</h2>
+                    <hr style="border-color: #1565C0;">
+                    <p>Hola <strong>{username}</strong>,</p>
+                    <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
+                    <p><strong>Tu código de verificación es:</strong></p>
+                    <div style="background: #f0f0f0; padding: 15px; text-align: center; font-family: monospace; font-size: 24px; letter-spacing: 2px; border-radius: 8px;">
+                        <strong>{token}</strong>
+                    </div>
+                    <p style="margin-top: 20px;">Este código expirará en <strong>30 minutos</strong>.</p>
+                    <p>Si no solicitaste este cambio, ignora este mensaje.</p>
+                    <hr>
+                    <p style="font-size: 12px; color: #666;">REmenus - Sistema de Menús Digitales</p>
+                </div>
+            </body>
+            </html>
+            """
+
+            mensaje.attach(MIMEText(html, "html"))
+
+            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                server.starttls()
+                server.login(EMAIL_USER, EMAIL_PASSWORD)
+                server.sendmail(EMAIL_USER, email, mensaje.as_string())
+
+            print(f"✅ Correo enviado a {email}")
             return True
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+            print(f"❌ Error al enviar correo: {e}")
             return False
-        finally:
-            conn.close()
-        
-    def validar_login(self, email, password):
-        print(f"\n🔐 Login: {email}")
-        print(f"   Contraseña: '{password}'")
-        
-        conn = self.db.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE Email = %s", (email,))
-        user = cursor.fetchone()
-        conn.close()
-        
-        if not user:
-            print("   ❌ Usuario no existe")
-            return None
-        
-        print(f"   Usuario: {user['User']}")
-        print(f"   Hash BD: {user['Password'][:50]}...")
-        
-        # Verificar
+
+    def solicitar_recuperacion(self, email: str) -> dict:
         try:
-            if bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
-                print("   ✅ LOGIN EXITOSO")
-                return user
+            usuario = self.usuario_model.obtener_por_email(email)
+
+            if not usuario:
+                return {
+                    "success": False,
+                    "message": "No existe una cuenta con este correo electrónico"
+                }
+
+            # Generar token que incluya el ID del usuario
+            token_data = f"{usuario['ID_usuario']}{email}{time.time()}"
+            token = hashlib.md5(token_data.encode()).hexdigest()
+
+            # Guardar token temporalmente
+            self.tokens_activos[token] = {
+                "user_id": usuario['ID_usuario'],
+                "email": email,
+                "expira": time.time() + 1800  # 30 minutos
+            }
+
+            envio = self.enviar_correo_recuperacion(email, token, usuario['User'])
+
+            if envio:
+                return {
+                    "success": True,
+                    "message": f"Se ha enviado un código de verificación a {email}"
+                }
             else:
-                print("   ❌ Contraseña incorrecta")
-                return None
+                return {
+                    "success": False,
+                    "message": "Error al enviar el correo. Verifica tu conexión"
+                }
+
         except Exception as e:
-            print(f"   ❌ Error: {e}")
-            return None
-    
-    def obtener_por_id(self, id_usuario):
-        conn = self.db.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT ID_usuario, User as nombre, Email as email FROM usuarios WHERE ID_usuario = %s", (id_usuario,))
-        user = cursor.fetchone()
-        conn.close()
-        return user
+            return {
+                "success": False,
+                "message": f"Error al procesar la solicitud: {str(e)}"
+            }
+
+    def restablecer_contraseña(self, token: str, nueva_password: str) -> dict:
+        try:
+            if token not in self.tokens_activos:
+                return {
+                    "success": False,
+                    "message": "Código inválido o expirado"
+                }
+
+            token_info = self.tokens_activos[token]
+
+            if time.time() > token_info["expira"]:
+                del self.tokens_activos[token]
+                return {
+                    "success": False,
+                    "message": "El código ha expirado. Solicita uno nuevo"
+                }
+
+            # Validar que la contraseña tenga al menos 6 caracteres
+            if len(nueva_password) < 6:
+                return {
+                    "success": False,
+                    "message": "La contraseña debe tener al menos 6 caracteres"
+                }
+
+            salt = bcrypt.gensalt(rounds=12)
+            hashed = bcrypt.hashpw(nueva_password.encode('utf-8'), salt)
+            hashed_str = hashed.decode('utf-8')
+
+            # Actualizar contraseña del usuario correcto
+            exito = self.usuario_model.actualizar_password(token_info["user_id"], hashed_str)
+
+            # Eliminar token usado
+            del self.tokens_activos[token]
+
+            if exito:
+                return {
+                    "success": True,
+                    "message": "Contraseña actualizada correctamente. Ahora puedes iniciar sesión."
+                }
+            else:
+                return {
+                    "success": False,
+                    "message": "Error al actualizar la contraseña"
+                }
+
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"Error al procesar la solicitud: {str(e)}"
+            }
+
+    # ========== MÉTODO DE COMPATIBILIDAD ==========
+    def reset_password(self, token: str, nueva_password: str) -> tuple:
+        """
+        Método de compatibilidad para otras vistas que esperan una tupla (bool, str)
+        """
+        resultado = self.restablecer_contraseña(token, nueva_password)
+        return resultado.get("success", False), resultado.get("message", "")
+
+    def obtener_usuario_por_id(self, id_usuario: int) -> dict:
+        """Obtiene información de un usuario por su ID"""
+        try:
+            usuario = self.usuario_model.obtener_por_id(id_usuario)
+            if usuario:
+                return {"success": True, "usuario": usuario}
+            return {"success": False, "message": "Usuario no encontrado"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def cambiar_password(self, id_usuario: int, password_actual: str, nueva_password: str) -> dict:
+        """Cambia la contraseña de un usuario verificando la actual"""
+        try:
+            # Verificar contraseña actual
+            user = self.usuario_model.validar_login(
+                self.usuario_model.obtener_por_id(id_usuario)["email"],
+                password_actual
+            )
+            
+            if not user:
+                return {"success": False, "message": "Contraseña actual incorrecta"}
+            
+            if len(nueva_password) < 6:
+                return {"success": False, "message": "La nueva contraseña debe tener al menos 6 caracteres"}
+            
+            # Generar nuevo hash
+            salt = bcrypt.gensalt(rounds=12)
+            hashed = bcrypt.hashpw(nueva_password.encode('utf-8'), salt)
+            hashed_str = hashed.decode('utf-8')
+            
+            exito = self.usuario_model.actualizar_password(id_usuario, hashed_str)
+            
+            if exito:
+                return {"success": True, "message": "Contraseña actualizada correctamente"}
+            return {"success": False, "message": "Error al actualizar la contraseña"}
+            
+        except Exception as e:
+            return {"success": False, "message": str(e)}
