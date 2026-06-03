@@ -7,28 +7,72 @@ def UserView(page, auth_controller):
     def formatear_fecha(fecha):
         if not fecha:
             return "No disponible"
-        if isinstance(fecha, str) and ' ' in fecha:
-            fecha_parte = fecha.split(' ')[0]  
-            hora_parte = fecha.split(' ')[1]  
-            año, mes, dia = fecha_parte.split('-')
-            return f"{dia}/{mes}/{año} {hora_parte}"
-        elif isinstance(fecha, str):
-            año, mes, dia = fecha.split('-')
-            return f"{dia}/{mes}/{año}"
+        if hasattr(fecha, 'strftime'):
+            return fecha.strftime("%d/%m/%Y")
+        if isinstance(fecha, str):
+            if ' ' in fecha:
+                fecha_parte = fecha.split(' ')[0]
+                partes = fecha_parte.split('-')
+                if len(partes) == 3:
+                    return f"{partes[2]}/{partes[1]}/{partes[0]}"
+            else:
+                partes = fecha.split('-')
+                if len(partes) == 3:
+                    return f"{partes[2]}/{partes[1]}/{partes[0]}"
         return str(fecha)
     
-    nombre = ft.Text(f"Nombre: {user['nombre'] if user else 'Usuario'}", size=20)
-    apellido = ft.Text(f"Apellido: {user['apellido'] if user else 'Usuario'}", size=20)
-    telefono = ft.Text(f"Teléfono: {user['telefono'] if user else 'Usuario'}", size=20)
-    email = ft.Text(f"Email: {user['email'] if user else 'Usuario'}", size=20)
-    fecha_registro = ft.Text(f"Fecha de creación de la cuenta: {formatear_fecha(user['fecha_registro']) if user else 'Usuario'}", size=20)
-    ultimo_acceso = ft.Text(f"Último acceso: {formatear_fecha(user['ultimo_acceso']) if user else 'Usuario'}", size=20)
-
+    # Si user es None, mostrar mensaje
+    if not user:
+        return ft.View(
+            route="/perfil",
+            controls=[
+                ft.AppBar(title=ft.Text("Perfil de Usuario", size=30)),
+                ft.Container(
+                    ft.Column([
+                        ft.Text("No hay datos de usuario disponibles", size=20, color=ft.Colors.RED),
+                        ft.ElevatedButton("Volver al inicio", on_click=lambda _: page.go("/"))
+                    ]),
+                    padding=20, expand=True,
+                    alignment=ft.alignment.center
+                ),
+            ]
+        )
+    
+    # Intentar obtener los valores de diferentes formas posibles
+    # Caso 1: Si user es un diccionario
+    if isinstance(user, dict):
+        nombre_usuario = user.get('User') or user.get('username') or user.get('nombre') or "No disponible"
+        email = user.get('Email') or user.get('email') or "No disponible"
+        id_usuario = user.get('ID_usuario') or user.get('id') or "No disponible"
+        fecha_registro = user.get('Fecha_Registro') or user.get('fecha_registro') or "No disponible"
+    
+    # Caso 2: Si user es un objeto (como una tupla o resultado de SQL)
+    elif isinstance(user, (tuple, list)):
+        # Asumiendo un orden común: (ID_usuario, User, Email, Password, Fecha_Registro)
+        if len(user) >= 5:
+            id_usuario = user[0] if user[0] else "No disponible"
+            nombre_usuario = user[1] if user[1] else "No disponible"
+            email = user[2] if user[2] else "No disponible"
+            fecha_registro = user[4] if user[4] else "No disponible"
+        else:
+            nombre_usuario = "Datos incompletos"
+            email = "Datos incompletos"
+            id_usuario = "Datos incompletos"
+            fecha_registro = "Datos incompletos"
+    
+    # Caso 3: Si tiene atributos
+    else:
+        nombre_usuario = getattr(user, 'User', None) or getattr(user, 'username', None) or "No disponible"
+        email = getattr(user, 'Email', None) or getattr(user, 'email', None) or "No disponible"
+        id_usuario = getattr(user, 'ID_usuario', None) or getattr(user, 'id', None) or "No disponible"
+        fecha_registro = getattr(user, 'Fecha_Registro', None) or getattr(user, 'fecha_registro', None) or "No disponible"
+    
+    # Construir la vista
     return ft.View(
         route="/perfil",
         controls=[
             ft.AppBar(
-                title=ft.Text(f"Perfil de Usuario", size=30),
+                title=ft.Text("Perfil de Usuario", size=30),
                 actions=[
                     ft.IconButton(ft.Icons.BOOK, on_click=lambda _: page.go("/dashboard")),
                     ft.IconButton(ft.Icons.EXIT_TO_APP, on_click=lambda _: page.go("/"))
@@ -37,18 +81,14 @@ def UserView(page, auth_controller):
             ft.Container(
                 ft.Column([
                     ft.Divider(thickness=8, color=ft.Colors.BLUE),
-                    ft.Row([nombre]),
+                    ft.Row([ft.Text(f"Usuario: {nombre_usuario}", size=20)]),
                     ft.Divider(thickness=6, color=ft.Colors.BLUE),
-                    ft.Row([apellido]),
+                    ft.Row([ft.Text(f"Email: {email}", size=20)]),
                     ft.Divider(thickness=6, color=ft.Colors.BLUE),
-                    ft.Row([telefono]),
+                    ft.Row([ft.Text(f"ID de Usuario: {id_usuario}", size=20)]),
                     ft.Divider(thickness=6, color=ft.Colors.BLUE),
-                    ft.Row([email]),
-                    ft.Divider(thickness=6, color=ft.Colors.BLUE),
+                    ft.Row([ft.Text(f"Fecha de registro: {formatear_fecha(fecha_registro)}", size=20)]),
                     ft.Divider(thickness=8, color=ft.Colors.BLUE),
-                    ft.Row([fecha_registro]),
-                    ft.Divider(thickness=8, color=ft.Colors.BLUE),
-                    ft.Row([ultimo_acceso]),
                 ], expand=True),
                 padding=20, expand=True,
             ),

@@ -17,6 +17,16 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
+-- Crear la base de datos
+--
+CREATE DATABASE IF NOT EXISTS `tareas`;
+
+--
+-- Usar la base de datos
+--
+USE `tareas`;
+
+--
 -- Base de datos: `tareas`
 --
 
@@ -128,10 +138,9 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
--- Usuario de prueba con contraseña "1234" (hasheada)
 INSERT INTO `usuarios` (`ID_usuario`, `User`, `Email`, `Password`, `Fecha_Registro`) VALUES
-(1, 'admin', 'admin@remenus.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTt2O9uH7FjZbi', CURDATE()),
-(2, 'test', 'test@test.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTt2O9uH7FjZbi', CURDATE());
+(1, 'admin', 'admin@remenus.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTt2O9uH7FjZbi', '2026-06-03'),
+(2, 'test', 'test@test.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTt2O9uH7FjZbi', '2026-06-03');
 
 --
 -- Índices para tablas volcadas
@@ -213,7 +222,6 @@ ALTER TABLE `restaurantemaris`
 --
 ALTER TABLE `restaurantemex`
   ADD CONSTRAINT `fk_mex_usuario` FOREIGN KEY (`ID_usuario`) REFERENCES `usuarios` (`ID_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
