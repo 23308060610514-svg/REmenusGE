@@ -49,7 +49,7 @@ class AuthController:
         try:
             # Configuración - CAMBIA ESTOS DATOS
             EMAIL_USER = "ruelas.pato.2009@gmail.com"
-            EMAIL_PASSWORD = "fjio arzz vbmd yqcu"
+            EMAIL_PASSWORD = "ipri qprz rqbv zbeo"
 
             mensaje = MIMEMultipart("alternative")
             mensaje["Subject"] = "REmenus - Recuperación de Contraseña"

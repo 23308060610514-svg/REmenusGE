@@ -24,14 +24,20 @@ def CarritoView(page: ft.Page, auth_controller):
         page.update()
     
     def eliminar_del_carrito(index):
-        platillo = page.user_data['carrito'].pop(index)
-        mostrar_snackbar(f"✗ {platillo['nombre']} eliminado del carrito", ft.Colors.RED_600)
-        page.go("/carrito")  # Recargar la vista
+        # Verificar que el índice sea válido
+        if 0 <= index < len(page.user_data['carrito']):
+            platillo = page.user_data['carrito'].pop(index)
+            mostrar_snackbar(f"✗ {platillo['nombre']} eliminado del carrito", ft.Colors.RED_600)
+            # Recargar la vista actualizando el contenido
+            actualizar_carrito()
     
     def vaciar_carrito(e):
-        page.user_data['carrito'].clear()
-        mostrar_snackbar("Carrito vaciado correctamente", ft.Colors.ORANGE_600)
-        page.go("/carrito")
+        if page.user_data['carrito']:
+            page.user_data['carrito'].clear()
+            mostrar_snackbar("Carrito vaciado correctamente", ft.Colors.ORANGE_600)
+            actualizar_carrito()
+        else:
+            mostrar_snackbar("El carrito ya está vacío", ft.Colors.ORANGE_600)
     
     def realizar_pedido(e):
         if not page.user_data['carrito']:
@@ -41,66 +47,88 @@ def CarritoView(page: ft.Page, auth_controller):
         total = sum(float(item['precio']) for item in page.user_data['carrito'])
         mostrar_snackbar(f"✓ Pedido realizado por ${total:.2f}. ¡Gracias por tu compra!", ft.Colors.GREEN_600)
         page.user_data['carrito'].clear()
+        actualizar_carrito()
         page.go("/dashboard")
     
-    # Crear lista de items del carrito
-    items_carrito = []
-    total = 0
-    carrito = page.user_data['carrito']  # Referencia local
-    
-    for i, item in enumerate(carrito):
-        subtotal = float(item['precio'])
-        total += subtotal
+    def actualizar_carrito():
+        """Actualiza la vista del carrito sin recargar toda la página"""
+        # Limpiar el contenedor de items
+        contenedor_items.controls.clear()
         
-        tarjeta = ft.Container(
-            content=ft.Row(
-                [
-                    ft.Icon(ft.Icons.FASTFOOD, size=40, color=ft.Colors.BLUE_600),
-                    ft.Column(
+        carrito = page.user_data['carrito']
+        total = 0
+        
+        if not carrito:
+            # Mostrar mensaje de carrito vacío
+            contenedor_items.controls.append(
+                ft.Container(
+                    content=ft.Column(
                         [
-                            ft.Text(item['nombre'], size=18, weight=ft.FontWeight.BOLD),
-                            ft.Text(f"Mesa: {item['mesa']}", size=12, color=ft.Colors.GREY_600),
-                            ft.Text(f"${subtotal:.2f}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700),
+                            ft.Icon(ft.Icons.SHOPPING_CART, size=80, color=ft.Colors.GREY_400),
+                            ft.Text("Tu carrito está vacío", size=20, color=ft.Colors.GREY_600),
+                            ft.Text("Agrega platillos desde el Dashboard", size=14, color=ft.Colors.GREY_500),
                         ],
-                        spacing=5,
-                        expand=True,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=10,
                     ),
-                    ft.IconButton(
-                        icon=ft.Icons.DELETE,
-                        icon_color=ft.Colors.RED_600,
-                        icon_size=30,
-                        on_click=lambda e, idx=i: eliminar_del_carrito(idx),
-                        tooltip="Eliminar",
-                    ),
-                ],
-                alignment=ft.MainAxisAlignment.START,
-            ),
-            bgcolor=ft.Colors.WHITE,
-            border_radius=15,
-            padding=15,
-            margin=ft.margin.only(bottom=10),
-            shadow=ft.BoxShadow(blur_radius=5, color=ft.Colors.GREY_300),
-        )
-        items_carrito.append(tarjeta)
-    
-    # Si el carrito está vacío
-    if not items_carrito:
-        items_carrito.append(
-            ft.Container(
-                content=ft.Column(
-                    [
-                        ft.Icon(ft.Icons.SHOPPING_CART, size=80, color=ft.Colors.GREY_400),
-                        ft.Text("Tu carrito está vacío", size=20, color=ft.Colors.GREY_600),
-                        ft.Text("Agrega platillos desde el Dashboard", size=14, color=ft.Colors.GREY_500),
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=10,
-                ),
-                padding=50,
-                bgcolor=ft.Colors.WHITE,
-                border_radius=15,
+                    padding=50,
+                    bgcolor=ft.Colors.WHITE,
+                    border_radius=15,
+                )
             )
-        )
+            # Actualizar resumen
+            resumen_items.value = f"📦 Items: 0"
+            resumen_total.value = f"💰 Total: $0.00"
+        else:
+            # Crear tarjetas para cada platillo
+            for i, item in enumerate(carrito):
+                subtotal = float(item['precio'])
+                total += subtotal
+                
+                tarjeta = ft.Container(
+                    content=ft.Row(
+                        [
+                            ft.Icon(ft.Icons.FASTFOOD, size=40, color=ft.Colors.BLUE_600),
+                            ft.Column(
+                                [
+                                    ft.Text(item['nombre'], size=18, weight=ft.FontWeight.BOLD),
+                                    ft.Text(f"Mesa: {item['mesa']}", size=12, color=ft.Colors.GREY_600),
+                                    ft.Text(f"${subtotal:.2f}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700),
+                                ],
+                                spacing=5,
+                                expand=True,
+                            ),
+                            ft.IconButton(
+                                icon=ft.Icons.DELETE,
+                                icon_color=ft.Colors.RED_600,
+                                icon_size=30,
+                                on_click=lambda e, idx=i: eliminar_del_carrito(idx),
+                                tooltip="Eliminar",
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.START,
+                    ),
+                    bgcolor=ft.Colors.WHITE,
+                    border_radius=15,
+                    padding=15,
+                    margin=ft.margin.only(bottom=10),
+                    shadow=ft.BoxShadow(blur_radius=5, color=ft.Colors.GREY_300),
+                )
+                contenedor_items.controls.append(tarjeta)
+            
+            # Actualizar resumen
+            resumen_items.value = f"📦 Items: {len(carrito)}"
+            resumen_total.value = f"💰 Total: ${total:.2f}"
+        
+        page.update()
+    
+    # Crear elementos de resumen (se actualizarán dinámicamente)
+    resumen_items = ft.Text(f"📦 Items: {len(page.user_data['carrito'])}", size=16, weight=ft.FontWeight.BOLD)
+    resumen_total = ft.Text(f"💰 Total: ${sum(float(item['precio']) for item in page.user_data['carrito']):.2f}", 
+                            size=20, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
+    
+    # Contenedor para los items del carrito (se actualizará dinámicamente)
+    contenedor_items = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO, expand=True)
     
     # Botones
     btn_volver = ft.IconButton(
@@ -132,6 +160,61 @@ def CarritoView(page: ft.Page, auth_controller):
         ),
     )
     
+    # Inicializar la vista con los items actuales
+    carrito_actual = page.user_data['carrito']
+    total_actual = sum(float(item['precio']) for item in carrito_actual)
+    
+    if not carrito_actual:
+        contenedor_items.controls.append(
+            ft.Container(
+                content=ft.Column(
+                    [
+                        ft.Icon(ft.Icons.SHOPPING_CART, size=80, color=ft.Colors.GREY_400),
+                        ft.Text("Tu carrito está vacío", size=20, color=ft.Colors.GREY_600),
+                        ft.Text("Agrega platillos desde el Dashboard", size=14, color=ft.Colors.GREY_500),
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=10,
+                ),
+                padding=50,
+                bgcolor=ft.Colors.WHITE,
+                border_radius=15,
+            )
+        )
+    else:
+        for i, item in enumerate(carrito_actual):
+            subtotal = float(item['precio'])
+            tarjeta = ft.Container(
+                content=ft.Row(
+                    [
+                        ft.Icon(ft.Icons.FASTFOOD, size=40, color=ft.Colors.BLUE_600),
+                        ft.Column(
+                            [
+                                ft.Text(item['nombre'], size=18, weight=ft.FontWeight.BOLD),
+                                ft.Text(f"Mesa: {item['mesa']}", size=12, color=ft.Colors.GREY_600),
+                                ft.Text(f"${subtotal:.2f}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700),
+                            ],
+                            spacing=5,
+                            expand=True,
+                        ),
+                        ft.IconButton(
+                            icon=ft.Icons.DELETE,
+                            icon_color=ft.Colors.RED_600,
+                            icon_size=30,
+                            on_click=lambda e, idx=i: eliminar_del_carrito(idx),
+                            tooltip="Eliminar",
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                ),
+                bgcolor=ft.Colors.WHITE,
+                border_radius=15,
+                padding=15,
+                margin=ft.margin.only(bottom=10),
+                shadow=ft.BoxShadow(blur_radius=5, color=ft.Colors.GREY_300),
+            )
+            contenedor_items.controls.append(tarjeta)
+    
     return ft.View(
         route="/carrito",
         bgcolor=ft.Colors.GREY_50,
@@ -147,13 +230,10 @@ def CarritoView(page: ft.Page, auth_controller):
                 [
                     ft.Container(height=10),
                     
-                    # Resumen del carrito
+                    # Resumen del carrito (actualizable)
                     ft.Container(
                         content=ft.Row(
-                            [
-                                ft.Text(f"📦 Items: {len(carrito)}", size=16, weight=ft.FontWeight.BOLD),
-                                ft.Text(f"💰 Total: ${total:.2f}", size=20, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700),
-                            ],
+                            [resumen_items, resumen_total],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         ),
                         padding=15,
@@ -162,8 +242,8 @@ def CarritoView(page: ft.Page, auth_controller):
                         margin=ft.margin.only(bottom=10),
                     ),
                     
-                    # Lista de items
-                    ft.Column(items_carrito, scroll=ft.ScrollMode.AUTO, spacing=10, expand=True),
+                    # Lista de items (actualizable)
+                    contenedor_items,
                     
                     # Botones de acción
                     ft.Row(
