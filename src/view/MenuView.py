@@ -61,7 +61,7 @@ def MenuView(page: ft.Page, auth_controller, menu_controller):
         ]
     )
     
-    # ✅ CORRECTO - Un solo controls
+    
     return ft.View(
         route="/dashboard",
         bgcolor=ft.Colors.GREY_50,
