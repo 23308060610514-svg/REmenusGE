@@ -5,7 +5,7 @@ def CarritoView(page: ft.Page, auth_controller):
     page.bgcolor = ft.Colors.GREY_50
     page.title = "REmenus - Carrito"
     
-    # Inicializar carrito en user_data si no existe
+    
     if page.user_data is None:
         page.user_data = {}
     if 'carrito' not in page.user_data:
@@ -24,11 +24,11 @@ def CarritoView(page: ft.Page, auth_controller):
         page.update()
     
     def eliminar_del_carrito(index):
-        # Verificar que el índice sea válido
+       
         if 0 <= index < len(page.user_data['carrito']):
             platillo = page.user_data['carrito'].pop(index)
             mostrar_snackbar(f"✗ {platillo['nombre']} eliminado del carrito", ft.Colors.RED_600)
-            # Recargar la vista actualizando el contenido
+            
             actualizar_carrito()
     
     def vaciar_carrito(e):
@@ -52,14 +52,14 @@ def CarritoView(page: ft.Page, auth_controller):
     
     def actualizar_carrito():
         """Actualiza la vista del carrito sin recargar toda la página"""
-        # Limpiar el contenedor de items
+        
         contenedor_items.controls.clear()
         
         carrito = page.user_data['carrito']
         total = 0
         
         if not carrito:
-            # Mostrar mensaje de carrito vacío
+            
             contenedor_items.controls.append(
                 ft.Container(
                     content=ft.Column(
@@ -76,11 +76,11 @@ def CarritoView(page: ft.Page, auth_controller):
                     border_radius=15,
                 )
             )
-            # Actualizar resumen
+           
             resumen_items.value = f"📦 Items: 0"
             resumen_total.value = f"💰 Total: $0.00"
         else:
-            # Crear tarjetas para cada platillo
+            
             for i, item in enumerate(carrito):
                 subtotal = float(item['precio'])
                 total += subtotal
@@ -116,21 +116,21 @@ def CarritoView(page: ft.Page, auth_controller):
                 )
                 contenedor_items.controls.append(tarjeta)
             
-            # Actualizar resumen
+            
             resumen_items.value = f"📦 Items: {len(carrito)}"
             resumen_total.value = f"💰 Total: ${total:.2f}"
         
         page.update()
     
-    # Crear elementos de resumen (se actualizarán dinámicamente)
+   
     resumen_items = ft.Text(f"📦 Items: {len(page.user_data['carrito'])}", size=16, weight=ft.FontWeight.BOLD)
     resumen_total = ft.Text(f"💰 Total: ${sum(float(item['precio']) for item in page.user_data['carrito']):.2f}", 
                             size=20, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
     
-    # Contenedor para los items del carrito (se actualizará dinámicamente)
+    
     contenedor_items = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO, expand=True)
     
-    # Botones
+    
     btn_volver = ft.IconButton(
         icon=ft.Icons.ARROW_BACK,
         icon_color=ft.Colors.WHITE,
@@ -160,7 +160,7 @@ def CarritoView(page: ft.Page, auth_controller):
         ),
     )
     
-    # Inicializar la vista con los items actuales
+   
     carrito_actual = page.user_data['carrito']
     total_actual = sum(float(item['precio']) for item in carrito_actual)
     
@@ -230,7 +230,7 @@ def CarritoView(page: ft.Page, auth_controller):
                 [
                     ft.Container(height=10),
                     
-                    # Resumen del carrito (actualizable)
+                    
                     ft.Container(
                         content=ft.Row(
                             [resumen_items, resumen_total],
@@ -242,10 +242,10 @@ def CarritoView(page: ft.Page, auth_controller):
                         margin=ft.margin.only(bottom=10),
                     ),
                     
-                    # Lista de items (actualizable)
+                    
                     contenedor_items,
                     
-                    # Botones de acción
+                    
                     ft.Row(
                         [btn_vaciar, btn_comprar],
                         alignment=ft.MainAxisAlignment.CENTER,
