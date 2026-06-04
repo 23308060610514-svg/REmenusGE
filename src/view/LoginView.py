@@ -75,7 +75,7 @@ def LoginView(page: ft.Page, auth_controller):
     
     contraseña.on_submit = login_click
 
-    # ✅ CORRECTO
+    
     return ft.View(
         route="/",
         vertical_alignment=ft.MainAxisAlignment.CENTER,
