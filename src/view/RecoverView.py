@@ -82,7 +82,7 @@ def RecoverView(page: ft.Page, auth_controller):
         patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return re.match(patron, email) is not None
     
-    # ========== FUNCIONES PRINCIPALES ==========
+    
     def volver_login(e):
         page.go("/")
     
@@ -97,13 +97,13 @@ def RecoverView(page: ft.Page, auth_controller):
             mostrar_error("⚠️ Ingresa un correo electrónico válido")
             return
         
-        # Mostrar loading
+        
         btn_enviar.visible = False
         loading_indicator.visible = True
         page.update()
         
         try:
-            # Llamar al método correcto del controlador
+           
             resultado = auth_controller.solicitar_recuperacion(txt_email.value)
             
             if resultado.get("success"):
@@ -138,7 +138,7 @@ def RecoverView(page: ft.Page, auth_controller):
             mostrar_error("⚠️ Las contraseñas no coinciden")
             return
         
-        # Mostrar loading
+      
         btn_cambiar.visible = False
         loading_indicator.visible = True
         page.update()
@@ -150,7 +150,7 @@ def RecoverView(page: ft.Page, auth_controller):
                 mostrar_exito(resultado["message"])
                 page.update()
                 
-                # Redirigir después de 2.5 segundos
+               
                 await asyncio.sleep(2.5)
                 page.go("/")
             else:
@@ -173,7 +173,7 @@ def RecoverView(page: ft.Page, auth_controller):
     def volver_formulario_email(e):
         contenido.controls.clear()
         contenido.controls.append(formulario_email)
-        # Limpiar campos del formulario de restablecimiento
+        
         txt_token.value = ""
         nueva_password.value = ""
         confirmar_password.value = ""
