@@ -35,31 +35,39 @@ Ruelas Lopez Guillermo Adiel
 
 
 informacion que necesito para que se ejecute bien:
-# 1. Sal del entorno virtual actual
+# 1. Sincroniza e instala las dependencias del proyecto definidas en uv
+uv sync
+
+# 2. Sal del entorno virtual actual
 deactivate
 
-# 2. Elimina el entorno virtual viejo
+# 3. Elimina el entorno virtual viejo
 rm -r .venv
 
-# 3. Crea un nuevo entorno virtual
+# 4. Crea un nuevo entorno virtual
 python -m venv .venv
 
-# 4. Activa el nuevo entorno
+# 5. Activa el nuevo entorno virtual
 .venv\Scripts\activate
 
-# 5. Verifica que ahora apunta al lugar correcto
+# 6. Verifica qué instalación de Python se está utilizando
 where python
-# Debería mostrar: C:\Users\SALA2-PC2\Desktop\REmenusGE\.venv\Scripts\python.exe
+# Debería mostrar la ruta de python.exe dentro de .venv
 
-# 6. Instala los paquetes (ya no debería decir)
+# 7. Instala la librería para validar correos electrónicos
 pip install email-validator
+
+# 8. Actualiza pip a la versión más reciente
+python.exe -m pip install --upgrade pip
+
+# 9. Instala Pydantic con soporte para validación de correos
 pip install 'pydantic[email]'
+
+# 10. Instala el conector oficial para bases de datos MySQL
 pip install mysql-connector-python
 
-# 7. Ejecuta tu aplicación
+# 11. Agrega e instala la librería Flet usando uv
+uv add flet
+
+# 12. Ejecuta la aplicación principal
 python src/main.py
-
-# 8. por si acaso:
-uv add pyjwt
-
-uv sync
