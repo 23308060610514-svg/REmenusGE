@@ -1,4 +1,4 @@
-from .databaseModel import Database  # ← CORRECTO
+from .databaseModel import Database  
 
 class MenuModel:
     def __init__(self):
