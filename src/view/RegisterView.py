@@ -131,7 +131,7 @@ def RegisterView(page: ft.Page, auth_controller):
     
     confirm_password.on_submit = registrar_click
     
-    # ✅ CORRECTO
+   
     return ft.View(
         route="/register",
         vertical_alignment=ft.MainAxisAlignment.CENTER,
