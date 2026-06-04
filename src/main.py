@@ -20,7 +20,7 @@ def start(page: ft.Page):
     def route_change(e):
         print(f"📍 Ruta: {page.route}")
     
-    # Crear la vista según la ruta
+    
         if page.route == "/":
             view = LoginView(page, auth_ctrl)
         elif page.route == "/register": 
