@@ -21,7 +21,7 @@ def UserView(page, auth_controller):
                     return f"{partes[2]}/{partes[1]}/{partes[0]}"
         return str(fecha)
     
-    # Si user es None, mostrar mensaje
+    
     if not user:
         return ft.View(
             route="/perfil",
@@ -38,17 +38,16 @@ def UserView(page, auth_controller):
             ]
         )
     
-    # Intentar obtener los valores de diferentes formas posibles
-    # Caso 1: Si user es un diccionario
+  
     if isinstance(user, dict):
         nombre_usuario = user.get('User') or user.get('username') or user.get('nombre') or "No disponible"
         email = user.get('Email') or user.get('email') or "No disponible"
         id_usuario = user.get('ID_usuario') or user.get('id') or "No disponible"
         fecha_registro = user.get('Fecha_Registro') or user.get('fecha_registro') or "No disponible"
     
-    # Caso 2: Si user es un objeto (como una tupla o resultado de SQL)
+   
     elif isinstance(user, (tuple, list)):
-        # Asumiendo un orden común: (ID_usuario, User, Email, Password, Fecha_Registro)
+       
         if len(user) >= 5:
             id_usuario = user[0] if user[0] else "No disponible"
             nombre_usuario = user[1] if user[1] else "No disponible"
@@ -60,14 +59,14 @@ def UserView(page, auth_controller):
             id_usuario = "Datos incompletos"
             fecha_registro = "Datos incompletos"
     
-    # Caso 3: Si tiene atributos
+    
     else:
         nombre_usuario = getattr(user, 'User', None) or getattr(user, 'username', None) or "No disponible"
         email = getattr(user, 'Email', None) or getattr(user, 'email', None) or "No disponible"
         id_usuario = getattr(user, 'ID_usuario', None) or getattr(user, 'id', None) or "No disponible"
         fecha_registro = getattr(user, 'Fecha_Registro', None) or getattr(user, 'fecha_registro', None) or "No disponible"
     
-    # Construir la vista
+    
     return ft.View(
         route="/perfil",
         controls=[
