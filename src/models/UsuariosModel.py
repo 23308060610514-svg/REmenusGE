@@ -17,7 +17,7 @@ class UsuarioModel:
         print(f"📝 Registrando: {usuario_data.email}")
         print(f"   Contraseña: '{usuario_data.password}'")
         
-        # Generar hash
+        
         password_bytes = usuario_data.password.encode('utf-8')
         salt = bcrypt.gensalt(rounds=12)
         hashed = bcrypt.hashpw(password_bytes, salt)
@@ -59,7 +59,7 @@ class UsuarioModel:
         print(f"   Usuario: {user['User']}")
         print(f"   Hash BD: {user['Password'][:50]}...")
         
-        # Verificar
+        
         try:
             if bcrypt.checkpw(password.encode('utf-8'), user['Password'].encode('utf-8')):
                 print("   ✅ LOGIN EXITOSO")
