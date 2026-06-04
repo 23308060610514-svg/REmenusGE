@@ -6,16 +6,16 @@ def DashboardView(page: ft.Page, auth_controller):
     page.bgcolor = ft.Colors.GREY_50
     page.title = "REmenus - Dashboard"
     
-    # Inicializar carrito en user_data si no existe
+    
     if page.user_data is None:
         page.user_data = {}
     if 'carrito' not in page.user_data:
         page.user_data['carrito'] = []
     
-    # Crear el modelo directamente
+   
     menu_model = MenuModel()
     
-    # Obtener nombre del usuario
+   
     nombre_usuario = page.user_data.get('nombre', 'Usuario') if page.user_data else "Usuario"
     
     def mostrar_snackbar(mensaje, color=ft.Colors.GREEN_600):
@@ -39,22 +39,22 @@ def DashboardView(page: ft.Page, auth_controller):
         page.go("/carrito")
     
     def agregar_al_carrito(platillo):
-        # Agregar al carrito en user_data
+        
         page.user_data['carrito'].append(platillo)
         total_items = len(page.user_data['carrito'])
         total_precio = sum(float(item['precio']) for item in page.user_data['carrito'])
         mostrar_snackbar(f"✓ {platillo['nombre']} agregado al carrito (Total: {total_items} items - ${total_precio:.2f})", ft.Colors.GREEN_600)
         
-        # Actualizar el contador del botón del carrito
+        
         btn_carrito.content = ft.Text(f"🛒 {total_items}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)
         page.update()
     
-    # Obtener platillos de cada categoría
+    
     platillos_mexicanos = menu_model.obtener_platillos_mexicanos()
     platillos_chinos = menu_model.obtener_platillos_chinos()
     platillos_mariscos = menu_model.obtener_platillos_mariscos()
     
-    # ========== FUNCIÓN PARA CREAR TARJETA DE PLATILLO ==========
+    
     def crear_tarjeta_platillo(platillo, color):
         return ft.Container(
             content=ft.Row(
@@ -91,7 +91,7 @@ def DashboardView(page: ft.Page, auth_controller):
             shadow=ft.BoxShadow(blur_radius=5, color=ft.Colors.GREY_300),
         )
     
-    # ========== CREAR SECCIONES DE CATEGORÍAS ==========
+    
     
     # Sección Comida Mexicana
     tarjetas_mexicanas = []
@@ -165,7 +165,7 @@ def DashboardView(page: ft.Page, auth_controller):
         margin=ft.margin.only(bottom=20),
     )
     
-    # Botón del carrito con contador
+    
     total_items = len(page.user_data['carrito'])
     btn_carrito = ft.Container(
         content=ft.Text(f"🛒 {total_items}", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
@@ -189,7 +189,7 @@ def DashboardView(page: ft.Page, auth_controller):
         tooltip="Cerrar Sesión",
     )
     
-    # ========== VISTA PRINCIPAL CON SCROLL ==========
+   
     return ft.View(
         route="/dashboard",
         bgcolor=ft.Colors.GREY_50,
@@ -203,7 +203,6 @@ def DashboardView(page: ft.Page, auth_controller):
         controls=[
             ft.ListView(
                 [
-                    # Tarjeta de bienvenida
                     ft.Container(
                         content=ft.Column(
                             [
@@ -230,9 +229,9 @@ def DashboardView(page: ft.Page, auth_controller):
                     # Sección Mariscos
                     seccion_mariscos,
                     
-                    # Pie de página
+                    
                     ft.Container(
-                        content=ft.Text("© 2024 REMenus - Todos los derechos reservados", 
+                        content=ft.Text("© 2026 REMenus - Todos los derechos reservados", 
                                        size=12, color=ft.Colors.GREY_500),
                         padding=20,
                     ),
