@@ -9,7 +9,7 @@ import hashlib
 class AuthController:
     def __init__(self):
         self.usuario_model = UsuarioModel()
-        self.tokens_activos = {}  # Almacén temporal de tokens
+        self.tokens_activos = {}  
 
     def login(self, email, password):
         try:
@@ -47,7 +47,7 @@ class AuthController:
     def enviar_correo_recuperacion(self, email, token, username):
         """Envía correo real de recuperación"""
         try:
-            # Configuración - CAMBIA ESTOS DATOS
+            
             EMAIL_USER = "ruelas.pato.2009@gmail.com"
             EMAIL_PASSWORD = "ipri qprz rqbv zbeo"
 
@@ -100,15 +100,15 @@ class AuthController:
                     "message": "No existe una cuenta con este correo electrónico"
                 }
 
-            # Generar token que incluya el ID del usuario
+            
             token_data = f"{usuario['ID_usuario']}{email}{time.time()}"
             token = hashlib.md5(token_data.encode()).hexdigest()
 
-            # Guardar token temporalmente
+           
             self.tokens_activos[token] = {
                 "user_id": usuario['ID_usuario'],
                 "email": email,
-                "expira": time.time() + 1800  # 30 minutos
+                "expira": time.time() + 1800  
             }
 
             envio = self.enviar_correo_recuperacion(email, token, usuario['User'])
@@ -147,7 +147,7 @@ class AuthController:
                     "message": "El código ha expirado. Solicita uno nuevo"
                 }
 
-            # Validar que la contraseña tenga al menos 6 caracteres
+            
             if len(nueva_password) < 6:
                 return {
                     "success": False,
@@ -158,10 +158,10 @@ class AuthController:
             hashed = bcrypt.hashpw(nueva_password.encode('utf-8'), salt)
             hashed_str = hashed.decode('utf-8')
 
-            # Actualizar contraseña del usuario correcto
+            
             exito = self.usuario_model.actualizar_password(token_info["user_id"], hashed_str)
 
-            # Eliminar token usado
+            
             del self.tokens_activos[token]
 
             if exito:
@@ -181,7 +181,7 @@ class AuthController:
                 "message": f"Error al procesar la solicitud: {str(e)}"
             }
 
-    # ========== MÉTODO DE COMPATIBILIDAD ==========
+    
     def reset_password(self, token: str, nueva_password: str) -> tuple:
         """
         Método de compatibilidad para otras vistas que esperan una tupla (bool, str)
@@ -202,7 +202,7 @@ class AuthController:
     def cambiar_password(self, id_usuario: int, password_actual: str, nueva_password: str) -> dict:
         """Cambia la contraseña de un usuario verificando la actual"""
         try:
-            # Verificar contraseña actual
+            
             user = self.usuario_model.validar_login(
                 self.usuario_model.obtener_por_id(id_usuario)["email"],
                 password_actual
@@ -214,7 +214,7 @@ class AuthController:
             if len(nueva_password) < 6:
                 return {"success": False, "message": "La nueva contraseña debe tener al menos 6 caracteres"}
             
-            # Generar nuevo hash
+            
             salt = bcrypt.gensalt(rounds=12)
             hashed = bcrypt.hashpw(nueva_password.encode('utf-8'), salt)
             hashed_str = hashed.decode('utf-8')
